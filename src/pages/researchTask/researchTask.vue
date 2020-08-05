@@ -123,7 +123,12 @@
       >
         <el-table-column type="selection" width="80"></el-table-column>
         <el-table-column label="调研编号" width="150">
-          <template slot-scope="scope">{{ scope.row.date }}</template>
+          <template slot-scope="scope">
+            <span
+              style="color:blue;cursor:pointer;"
+              @click="skipDetail(scope.row)"
+            >{{ scope.row.date }}</span>
+          </template>
         </el-table-column>
         <el-table-column prop="name" label="调研主题" width="150"></el-table-column>
         <el-table-column prop="address" label="调研发起人" width="150" show-overflow-tooltip></el-table-column>
@@ -148,17 +153,21 @@
     <v-add-research-task v-if="showTaskDialog"></v-add-research-task>
     <!--编辑-->
     <v-edit-research-task v-if="showEditTaskDialog"></v-edit-research-task>
+    <!--详情-->
+    <v-research-task v-if="showDetailTaskDialog"></v-research-task>
   </div>
 </template>
 
 <script>
 import VAddResearchTask from "./addResearchTask";
 import VEditResearchTask from "./editResearchTask";
+import VResearchTask from "./ResearchTaskDetail";
 import { Message } from "element-ui";
 export default {
   components: {
     VAddResearchTask,
     VEditResearchTask,
+    VResearchTask,
   },
   data() {
     return {
@@ -166,6 +175,7 @@ export default {
       showTaskDialog: false,
       currentPage4: 4,
       showEditTaskDialog: false,
+      showDetailTaskDialog: false,
       classAList: [
         { name: "个人业务", value: "1" },
         { name: "运行管理", value: "2" },
@@ -231,6 +241,9 @@ export default {
     };
   },
   methods: {
+    skipDetail(row) {
+      this.showDetailTaskDialog = true;
+    },
     closeAdd() {
       this.showTaskDialog = false;
     },

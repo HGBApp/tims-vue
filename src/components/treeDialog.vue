@@ -7,23 +7,33 @@
       :data="data"
       :props="defaultProps"
       @node-click="handleNodeClick"
+      node-key="id"
+      :check-strictly="true"
     ></el-tree>
+    <span slot="footer" class="dialog-footer">
+      <el-button @click="dialogVisible = false">取 消</el-button>
+      <el-button type="primary" @click="confirm">确 定</el-button>
+    </span>
   </el-dialog>
 </template>
 
 <script>
 import { Message } from "element-ui";
+import { MessageBox } from "element-ui";
 export default {
   data() {
     return {
       data: [
         {
+          id: "1",
           label: "一级 1",
           children: [
             {
+              id: "1-1",
               label: "二级 1-1",
               children: [
                 {
+                  id: "1-1-1",
                   label: "三级 1-1-1",
                 },
               ],
@@ -31,20 +41,25 @@ export default {
           ],
         },
         {
+          id: "2",
           label: "一级 2",
           children: [
             {
+              id: "2-1",
               label: "二级 2-1",
               children: [
                 {
+                  id: "2-1-1",
                   label: "三级 2-1-1",
                 },
               ],
             },
             {
+              id: "2-2",
               label: "二级 2-2",
               children: [
                 {
+                  id: "2-2-1",
                   label: "三级 2-2-1",
                 },
               ],
@@ -52,20 +67,25 @@ export default {
           ],
         },
         {
+          id: "3",
           label: "一级 3",
           children: [
             {
+              id: "3-1",
               label: "二级 3-1",
               children: [
                 {
+                  id: "3-1-1",
                   label: "三级 3-1-1",
                 },
               ],
             },
             {
+              id: "3-2",
               label: "二级 3-2",
               children: [
                 {
+                  id: "3-2-1",
                   label: "三级 3-2-1",
                 },
               ],
@@ -78,10 +98,17 @@ export default {
         label: "label",
       },
       dialogVisible: true,
-      checked: [],
+
+      selectOrg: {
+        orgsid: [],
+      },
     };
   },
   methods: {
+    confirm() {
+      this.$emit("getResearchObj", this.selectOrg.orgsid);
+      this.dialogVisible = false;
+    },
     close() {
       this.$emit("closeTree");
     },
@@ -89,23 +116,25 @@ export default {
       console.log(data);
     },
     handleCheckChange(data, checked, indeterminate) {
-      let { id } = data;
+      console.log(JSON.stringify(data), "数据");
+      // console.log(checked, "选中状态");
+      // console.log(indeterminate, "子树中选中状态");
+      // 获取当前选择的id在数组中的索引
+      const indexs = this.selectOrg.orgsid.indexOf(data.id);
+      // 如果不存在数组中，并且数组中已经有一个id并且checked为true的时候，代表不能再次选择。
+      if (indexs < 0 && this.selectOrg.orgsid.length === 1 && checked) {
+        console.log("only one");
 
-      let index = this.checked.indexOf(id);
-      // 当前节点不在this.checked中,且当前节点为选中状态
-      if (index < 0 && this.checked.length && checked) {
-        Message.warning("只能选中一个节点");
-        this.$refs.tree.setChecked(data, false); // 取消当前节点的选中状态
-        return;
-      }
-      // 当前节点在this.checked中,当前节点为未选中状态(主动去掉当前选中状态)
-      if (!checked && index >= 0 && this.checked.length) {
-        this.checked = [];
-        return;
-      }
-      // 当前节点不在this.checked(长度为0)中,当前节点为选中状态,this.checked中存储当前节点id
-      if (index < 0 && !this.checked.length && checked) {
-        this.checked.push(id);
+        // 设置已选择的节点为false 很重要
+        this.$refs.tree.setChecked(this.selectOrg.orgsid[0].id, false);
+        this.selectOrg.orgsid = [];
+        this.selectOrg.orgsid.push({ id: data.id, label: data.label });
+      } else if (this.selectOrg.orgsid.length === 0 && checked) {
+        console.log("********1");
+        // 发现数组为空 并且是已选择
+        // 防止数组有值，首先清空，再push
+        this.selectOrg.orgsid = [];
+        this.selectOrg.orgsid.push({ id: data.id, label: data.label });
       }
     },
   },

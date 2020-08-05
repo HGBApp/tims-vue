@@ -20,6 +20,8 @@ import {
   Checkbox,
   Upload,
   Tree,
+  Tabs,
+  TabPane,
 
 
 } from 'element-ui';
@@ -43,6 +45,8 @@ Vue.use(DatePicker);
 Vue.use(Checkbox);
 Vue.use(Upload);
 Vue.use(Tree);
+Vue.use(Tabs);
+Vue.use(TabPane);
 Vue.config.productionTip = false
 
 //Vue.use(ElementUI);

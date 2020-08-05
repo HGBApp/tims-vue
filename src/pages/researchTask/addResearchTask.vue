@@ -8,7 +8,7 @@
     fullscreen
   >
     <el-form
-      ref="form"
+      ref="ruleForm"
       :model="form"
       label-width="120px"
       size="mini"
@@ -30,11 +30,15 @@
               <el-button type="primary" size="mini" @click="change">选择</el-button>
             </el-col>
           </el-form-item>
-          <el-form-item label="一级业务标签" prop="classA">
+          <el-form-item label="一级业务标签" prop="researchObj">
             <el-col :span="23">
-              <el-select v-model="form.classA" placeholder="请选择活动区域" style="width:100%">
-                <el-option label="区域一" value="shanghai"></el-option>
-                <el-option label="区域二" value="beijing"></el-option>
+              <el-select v-model="form.classA" placeholder="请选择" style="width:100%">
+                <el-option
+                  v-for="(item,index) in classAList"
+                  :label="item.name"
+                  :value="item.value"
+                  :key="index"
+                >{{item.name}}</el-option>
               </el-select>
             </el-col>
           </el-form-item>
@@ -66,9 +70,16 @@
         </el-col>
 
         <el-col :span="9" :offset="6">
-          <el-form-item label="二级业务标签" prop="classB">
+          <el-form-item label="二级业务标签" prop="classA">
             <el-col :span="23">
-              <el-select v-model="form.classB" placeholder="请选择活动区域" style="width:100%"></el-select>
+              <el-select v-model="form.classA" placeholder="请选择" style="width:100%">
+                <el-option
+                  v-for="(item,index) in classBList"
+                  :label="item.name"
+                  :value="item.value"
+                  :key="index"
+                >{{item.name}}</el-option>
+              </el-select>
             </el-col>
           </el-form-item>
           <el-form-item label="可见范围" prop="visibleRange">
@@ -118,14 +129,14 @@
       </el-row>
       <el-row>
         <el-col :span="12" :offset="10">
-          <el-button type="primary" size="mini">保存</el-button>
+          <el-button type="primary" size="mini" @click="saveForm('ruleForm')">保存</el-button>
           <el-button size="mini">提交</el-button>
           <el-button size="mini">取消</el-button>
         </el-col>
       </el-row>
     </el-form>
     <!--树弹框-->
-    <v-tree-dialog v-if="showTreeDialog" @closeTree="closeTree"></v-tree-dialog>
+    <v-tree-dialog v-if="showTreeDialog" @closeTree="closeTree" @getResearchObj="getResearchObj"></v-tree-dialog>
   </el-dialog>
 </template>
 
@@ -156,15 +167,28 @@ export default {
         researchBackground: "",
         feedbackRequirements: "",
       },
+      classAList: [
+        { name: "个人业务", value: "1" },
+        { name: "运行管理", value: "2" },
+        { name: "银行卡业务", value: "3" },
+      ],
+      classBList: [
+        { name: "个人业务", value: "1" },
+        { name: "运行管理", value: "2" },
+        { name: "银行卡业务", value: "3" },
+      ],
       rules: {
         researchTopics: [
           { required: true, message: "请输入调研主题", trigger: "blur" },
         ],
         researchObj: [
-          { required: true, message: "请选择活动区域", trigger: "blur" },
+          { required: true, message: "请选择调研对象", trigger: "blur" },
         ],
         classA: [
           { required: true, message: "请选择一级业务标签", trigger: "change" },
+        ],
+        classB: [
+          { required: true, message: "请选择二级业务标签", trigger: "change" },
         ],
 
         TimeLimit: [
@@ -178,45 +202,59 @@ export default {
 
         researchSponsor: {
           required: true,
-          message: "请选择活动资源",
-          trigger: "change",
+          message: "请输入调研发起人",
+          trigger: "blur",
         },
         contactInformation: [
-          { required: true, message: "请选择活动资源", trigger: "change" },
+          { required: true, message: "请输入联系方式", trigger: "blur" },
         ],
         classB: [
-          { required: true, message: "请填写活动形式", trigger: "blur" },
+          { required: true, message: "请选择二级业务标签", trigger: "blur" },
         ],
+
         visibleRange: {
           required: true,
-          message: "请选择活动资源",
+          message: "请选择可见范围",
           trigger: "change",
         },
         researchPriorities: {
           required: true,
-          message: "请选择活动资源",
+          message: "请选择调研优先级",
           trigger: "change",
         },
 
         researchPurpose: {
           required: true,
-          message: "请选择活动资源",
-          trigger: "change",
+          message: "请输入调研目的",
+          trigger: "blur",
         },
         researchBackground: {
           required: true,
-          message: "请选择活动资源",
-          trigger: "change",
+          message: "请输入调研背景",
+          trigger: "blur",
         },
         feedbackRequirements: {
           required: true,
-          message: "请选择活动资源",
-          trigger: "change",
+          message: "请输入反馈要求",
+          trigger: "blur",
         },
       },
     };
   },
   methods: {
+    saveForm(formName) {
+      this.$refs[formName].validate((valid) => {
+        if (valid) {
+          alert("submit!");
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    },
+    getResearchObj(params) {
+      this.form.researchObj = params[0].label;
+    },
     change() {
       this.showTreeDialog = true;
     },
